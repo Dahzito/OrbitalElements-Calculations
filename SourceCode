@@ -1,0 +1,720 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Globalization;
+using System.Diagnostics.Eventing.Reader;
+using System.Net;
+
+namespace SFS_Orbital_Elements
+{
+    public static class Program
+    {
+        public static void Main()
+        {
+            string Version = "1.2.";
+
+
+            Console.WriteLine("|| SFS Orbital Elements - Calculations ||");
+            Console.WriteLine("\nThis can help on predicting planet trajectories in SFS, by also calculating some of the orbital elements of the planet or satellite in question.\n");
+            Console.WriteLine($"Made by: @Dahzito  ;  Version: {Version}");
+
+            while (true)
+            {
+                Console.WriteLine("\n\nParent of the Body:\n");
+                Console.Write("Radius (in m): "); double RadiusParent = double.Parse(Console.ReadLine());
+                double GravityParent = 0.0;
+                Console.Write("Gravity: "); GravityParent = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                CreditsCheck(GravityParent);
+
+                double GConstant = 6.67430 * 10e-11;
+
+                double MassParent = (GravityParent * Math.Pow(RadiusParent, 2.0)) / GConstant;
+
+                Console.WriteLine($"Mass of the Parent: {MassParent * 10} kg");
+
+                while (true)
+                {
+                    Console.Write("\nCalculate Orbital Elements of a Satellite or Body? [S/B]: "); char OL_Decision = Convert.ToChar(Console.ReadLine().ToUpper());
+
+                    if (OL_Decision == 'B') { Body(MassParent, GConstant, RadiusParent); }
+
+                    else if (OL_Decision == 'S') { Satellite(MassParent, GConstant, RadiusParent); }
+
+                    else { Console.WriteLine("...Invalid Input..."); }
+
+                    Console.Write("Leave? [y/n]: "); char Leave_OL = Convert.ToChar(Console.ReadLine().ToLower());
+                    if (Leave_OL == 'y') { break; }
+                    else { continue; }
+                }
+                Console.Write("Leave program? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
+
+                if (Leave == 'y') { break; }
+                else { continue; }
+            }
+        }
+        static void CreditsCheck(double GravityParent)
+        {
+            if (GravityParent == 4247) { Console.WriteLine("\nMade by: @Dahzito\n"); }
+            else if (GravityParent == 3.1415) { Console.WriteLine("\nMade by: @Dahzito\n"); }
+            else if (GravityParent == 2.718) { Console.WriteLine("\nMade by: @Dahzito\n"); }
+            else { }
+        }
+
+        static void Satellite(double MassParent, double GConstant, double RadiusParent)
+        {
+            char Choice_OL = 'y';
+            while (true)
+            {
+                Console.Write("\nCalculate Orbital Elements of a Satellite? [y/n]: "); Choice_OL = Convert.ToChar(Console.ReadLine().ToLower());
+
+                if (Choice_OL == 'y')
+                {
+                    Console.Write($"Calculate it by using Height, Radius, Semi-Major Axis, or Orbital Period? [H/R/S/O]: "); char SatChoice = Convert.ToChar(Console.ReadLine().ToUpper());
+                    if (SatChoice == 'S')
+                    {
+                        while (true) 
+                        { 
+                            SatelliteSemiMajorAxis(GConstant, MassParent, RadiusParent); 
+                            Console.WriteLine("Leave of this \"window\"? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
+                            if (Leave == 'y') { break; }
+                            else if (Leave == 'n') { continue; }
+                            else { Console.WriteLine("...Invalid Input, leaving by default..."); Thread.Sleep(2000); }
+                        }
+                    }
+                    else if (SatChoice == 'H')
+                    {
+                        while (true) 
+                        { 
+                            SatelliteHeight(GConstant, MassParent, RadiusParent);
+                            Console.WriteLine("Leave of this \"window\"? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
+                            if (Leave == 'y') { break; }
+                            else if (Leave == 'n') { continue; }
+                            else { Console.WriteLine("...Invalid Input, leaving by default..."); Thread.Sleep(2000); }
+                        }
+                    }
+                    else if (SatChoice == 'R')
+                    {
+                        while (true) 
+                        { 
+                            SatelliteRadius(GConstant, MassParent, RadiusParent);
+                            Console.WriteLine("Leave of this \"window\"? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
+                            if (Leave == 'y') { break; }
+                            else if (Leave == 'n') { continue; }
+                            else { Console.WriteLine("...Invalid Input, leaving by default..."); Thread.Sleep(2000); }
+                        }
+                    }
+                    else if (SatChoice == 'O')
+                    {
+                        while (true)
+                        {
+                            SatelliteOrbitalPeriod(GConstant, MassParent, RadiusParent);
+                            Console.WriteLine("Leave of this \"window\"? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
+                            if (Leave == 'y') { break; }
+                            else if (Leave == 'n') { continue; }
+                            else { Console.WriteLine("...Invalid Input, leaving by default..."); Thread.Sleep(2000); }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("...Invalid Input...");
+                        Thread.Sleep(2000);
+                    }
+
+                }
+                else if (Choice_OL == 'n')
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("...Invalid Input...");
+                    Thread.Sleep(2000);
+                }
+            }
+        }
+
+        static void Body(double GConstant, double MassParent, double RadiusParent)
+        {
+            char Choice_OL = 'y';
+            while (true)
+            {
+                Console.Write("\nCalculate Orbital Elements of a Body? [y/n]: "); Choice_OL = Convert.ToChar(Console.ReadLine().ToLower());
+                if (Choice_OL == 'y')
+                {
+                    {
+                        Console.WriteLine("\n\nMain Body:\n");
+                        Console.Write("Radius (in m): "); double RadiusPlanet = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                        Console.Write("Gravity: "); double GravityPlanet = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                        Console.Write("Semi-Major Axis: "); double SemiMajorAxis = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                        Console.Write("Eccentricity: "); double Eccentricity = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+                        double MassPlanet = (GravityPlanet * Math.Pow(RadiusPlanet, 2.0)) / GConstant;
+
+                        if (Eccentricity == 0.0)
+                        {
+                            double Velocity1Planet = Math.Sqrt((GConstant * MassParent) / SemiMajorAxis);
+                            double OrbitalPeriod = Math.Sqrt((4 * Math.Pow(Math.PI, 2) * Math.Pow(SemiMajorAxis, 3)) / (GConstant * MassParent));
+                            double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                            double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                            double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                            double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                            double ApoapsisDistance = 1 / ((1 + Eccentricity) * SemiMajorAxis);
+                            double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                            double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                            double C = (SemiMajorAxis + Math.Pow(Velocity1Planet, 2)) / (GConstant * MassParent);
+
+                            double λ = ((SemiMajorAxis * Velocity1Planet) / (GConstant * MassParent)) - 1;
+                            double FlightPathAngle = Math.Atan(1 / Math.Sqrt(Math.Pow(Eccentricity, 2) / Math.Pow(λ, 2)));
+
+                            double TrueAnomaly = Math.Atan((C * Math.Cos(FlightPathAngle) * Math.Sin(FlightPathAngle)) / (C * Math.Cos(FlightPathAngle) - 1));
+
+                            Console.WriteLine($"Mass of the Body: {Math.Round(MassPlanet, 2)}");
+                            Console.WriteLine($"\nα: {Math.Round(α, 2)} ; β: {Math.Round(β, 2)}");
+                            Console.WriteLine($"\nSemi-Major Axis: {Math.Round(SemiMajorAxis, 2)} m  ;  Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                            Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                            Console.WriteLine($"\nRadius of the Orbit: {SemiMajorAxis} m");
+                            Console.WriteLine($"Height: {SemiMajorAxis - RadiusParent}");
+                            Console.WriteLine($"Velocity of the Body: {Math.Round(Velocity1Planet, 2)} m/s");
+                            Console.WriteLine($"\nOrbital Period of the Body: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60))} min) ,or {(((OrbitalPeriod) / 60) / 60) / 24} days");
+                            Console.WriteLine($"Mean Motion of the Body: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+
+                            while (true)                          // Body Position after a given Epoch/Time
+                            {
+                                Console.Write("\nCalculate future position of the body? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+                                if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                                else if (Future_Choice == 'n') { break; }
+
+                                else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }                         // End of the Calculation of the Body Position after a given Epoch/Time
+                            }
+                            break;
+                        }
+                        else if (Eccentricity > 0.0 && Eccentricity <= 1.0)
+                        {
+                            double RadiusPeriapsis = Math.Abs(SemiMajorAxis * (Eccentricity - 1));
+                            double RadiusApoapsis = Math.Abs(SemiMajorAxis * (Eccentricity + 1));
+
+                            double VelocityPlanetPeriapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusApoapsis) / (RadiusPeriapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                            double VelocityPlanetApoapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusPeriapsis) / (RadiusApoapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                            double OrbitalPeriod = Math.Sqrt((4 * Math.Pow(Math.PI, 2) * Math.Pow(SemiMajorAxis, 3)) / (GConstant * MassParent));
+                            double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                            double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                            double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                            double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                            double ApoapsisDistance = 1 / ((1 + Eccentricity) * SemiMajorAxis);
+                            double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                            double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                            double λPeriapsis = ((RadiusPeriapsis * VelocityPlanetPeriapsis) / (GConstant * MassParent)) - 1;
+                            double λApoapsis = ((RadiusApoapsis * VelocityPlanetApoapsis) / (GConstant * MassParent)) - 1;
+
+                            double FlightPathAngle_Periapsis = Math.Atan(1 / Math.Sqrt(Math.Pow(Eccentricity, 2) / Math.Pow(λPeriapsis, 2)));
+                            double FlightPathAngle_Apoapsis = Math.Atan(1 / Math.Sqrt(Math.Pow(Eccentricity, 2) / Math.Pow(λPeriapsis, 2)));
+
+                            double C_Periapsis = (RadiusPeriapsis + Math.Pow(VelocityPlanetPeriapsis, 2)) / (GConstant * MassParent);
+                            double C_Apoapsis = (RadiusApoapsis + Math.Pow(VelocityPlanetApoapsis, 2)) / (GConstant * MassParent);
+
+                            double TrueAnomaly_Periapsis = Math.Atan((C_Periapsis * Math.Cos(FlightPathAngle_Periapsis) * Math.Sin(FlightPathAngle_Periapsis)) / (C_Periapsis * Math.Cos(FlightPathAngle_Periapsis) - 1));
+                            double TrueAnomaly_Apoapsis = Math.Atan((C_Apoapsis * Math.Cos(FlightPathAngle_Apoapsis) * Math.Sin(FlightPathAngle_Apoapsis)) / (C_Apoapsis * Math.Cos(FlightPathAngle_Apoapsis) - 1));
+
+                            Console.WriteLine($"Mass of the Body: {MassPlanet} kg");
+                            Console.WriteLine($"\nα: {Math.Round(α, 2)} ; β: {Math.Round(β, 2)}");
+                            Console.WriteLine($"\nSemi-Major Axis: {Math.Round(SemiMajorAxis, 2)} m  ;  Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                            Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                            Console.WriteLine($"\nRadius of the Orbit at: Periapsis: {Math.Round(RadiusPeriapsis, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis, 2)} m");
+                            Console.WriteLine($"Height at: Periapsis: {Math.Round(RadiusPeriapsis - RadiusParent, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis - RadiusParent, 2)} m");
+                            Console.WriteLine($"Velocity of the Body at: Periapsis: {Math.Round(VelocityPlanetPeriapsis, 2)} m/s ; Apoapsis: {Math.Round(VelocityPlanetApoapsis, 2)} m/s");
+                            Console.WriteLine($"\nOrbital Period of the Body: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60))} min) ,or {Math.Round((((OrbitalPeriod) / 60) / 60) / 24, 3)} days");
+                            Console.WriteLine($"Mean Motion of the Body: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+
+                            while (true)                          // Body Position after a given Epoch/Time
+                            {
+                                Console.Write("\nCalculate future position of the Body? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+                                if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                                else if (Future_Choice == 'n') { break; }
+
+                                else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+                            }
+                            break;
+                        }
+                        else if (Eccentricity > 1)
+                        {
+                            Console.WriteLine("Not possible to calculate the orbital elements of the Body with Eccentricity greater than 1");
+                            Console.Write("Leave program? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
+                            if (Leave == 'n') { break; }
+
+                            else if (Leave == 'y') { break; }
+
+                            else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); break; }
+                        }
+                    }
+                }
+                else if (Choice_OL == 'n') { break; }
+
+                else
+                {
+                    Console.WriteLine("...Invalid Input...");
+                    Thread.Sleep(2000);
+                }
+            }
+        }
+        static void BodyPosition(double MeanMotionPlanet, double Eccentricity, double SemiMajorAxis, double GConstant, double MassParent, double RadiusParent)
+        {
+            Console.Write("Calculate it in Years, Days, Hours, Minutes or Seconds? [y/d/h/m/s]: "); char Time_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+            Console.Write("\nTime elapsed since Periapsis: "); double Δt = Convert.ToDouble(Console.ReadLine(), CultureInfo.InvariantCulture);
+            
+            if (Time_Choice == 'y') { Δt = (((Δt * 24) * 60) * 60) * 365; }
+            if (Time_Choice == 'd') { Δt = ((Δt * 24) * 60) * 60;  }
+            else if (Time_Choice == 'h') { Δt = (Δt * 60) * 60; }
+            else if (Time_Choice == 'm') { Δt = (Δt * 60); }
+            else if (Time_Choice == 's') { Δt = Δt;  }
+            
+            else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); }     
+
+            Anomalies(MeanMotionPlanet, Δt, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent);
+
+        }
+        static void Anomalies(double MeanMotionPlanet, double Δt,  double Eccentricity, double SemiMajorAxis, double GConstant, double MassParent, double RadiusParent)
+        {
+            double FuturePosition_Rad = MeanMotionPlanet * (Δt - 0);
+            double FuturePosition_Degree = FuturePosition_Rad * (180 / Math.PI);
+            Console.WriteLine($"\nFuture Position (Mean Anomaly): {Math.Round(FuturePosition_Rad, 3)} rad ,or {Math.Round(FuturePosition_Degree, 3)}° ,or {Math.Round((FuturePosition_Degree / 360), 4)} Revolutions");
+
+            double eccentricAnomaly = FuturePosition_Rad; // Initial guess
+            for (int i = 0; i < 10; i++) // Iterate 10 times for convergence
+            {
+                eccentricAnomaly = FuturePosition_Rad + Eccentricity * Math.Sin(eccentricAnomaly);
+            }
+
+            double theta = 2 * Math.Atan(Math.Sqrt((1 + Eccentricity) / (1 - Eccentricity)) * Math.Tan(eccentricAnomaly / 2));
+            
+            double RadiusFuture = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2)) / (1 + Eccentricity * Math.Cos(theta));
+            double VelocityFuture = Math.Sqrt(GConstant*MassParent*((2/RadiusFuture)-(1/SemiMajorAxis)));
+
+            double λ = ((RadiusFuture * VelocityFuture) / (GConstant * MassParent)) - 1;
+            double FlightPathAngle = Math.Atan(1 / Math.Sqrt(Math.Pow(Eccentricity, 2) / Math.Pow(λ, 2)));
+
+            Console.WriteLine($"\nRadius:  {Math.Round(RadiusFuture, 2)} m  ,Height: {Math.Round(RadiusFuture - RadiusParent, 2)} m");
+            Console.WriteLine($"Velocity: {Math.Round(VelocityFuture, 2)} m/s");
+            Console.WriteLine($"\nFlight Path Angle: {Math.Round(FlightPathAngle, 4)}  rad  ,or  {Math.Round(FlightPathAngle * (180 / Math.PI), 4)}º");
+            Console.WriteLine($"Eccentric Anomaly: {Math.Round(eccentricAnomaly, 4)} rad  ,or {Math.Round(eccentricAnomaly * (180 / Math.PI), 4)}º");
+            Console.WriteLine($"True Anomaly: {Math.Round(theta,4)} rad  ,or {Math.Round(theta * (180 / Math.PI),4)}º");
+        }
+
+        static void SatelliteRadius(double GConstant, double MassParent, double RadiusParent)
+        {
+            Console.WriteLine("\nSatellite:\n");
+            Console.Write("Radius of the orbit at: ");
+            Console.Write("\nPeriapsis: "); double RadiusPeriapsis = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+            Console.Write("Apoapsis: "); double RadiusApoapsis = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+            double SemiMajorAxis = (RadiusPeriapsis + RadiusApoapsis) / 2;
+
+            double Eccentricity_Apoapsis = (RadiusApoapsis - SemiMajorAxis) / SemiMajorAxis;
+            double Eccentricity_Periapsis = (-RadiusPeriapsis + SemiMajorAxis) / SemiMajorAxis;
+
+            double Eccentricity = 0.0;
+
+            Eccentricity = Eccentricity_Apoapsis;
+
+            if (Eccentricity == 0.0)
+            {
+                double Velocity1Planet = Math.Sqrt((GConstant * MassParent) / SemiMajorAxis);
+                double OrbitalPeriod = Math.Sqrt((4 * Math.Pow(Math.PI, 2) * Math.Pow(SemiMajorAxis, 3)) / (GConstant * MassParent));
+                double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                double ApoapsisDistance = 1 / ((1 + Eccentricity) * SemiMajorAxis);
+                double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                Console.WriteLine($"\nRadius of the Orbit: {SemiMajorAxis} m");
+                Console.WriteLine($"Height: {SemiMajorAxis - RadiusParent}");
+                Console.WriteLine($"Semi-Major Axis: {Math.Round(SemiMajorAxis, 2)} ;Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                Console.WriteLine($"\nVelocity of the Satellite: {Math.Round(Velocity1Planet, 2)} m/s");
+                Console.WriteLine($"\nEccentricity: {Math.Round(Eccentricity, 4)}");
+                Console.WriteLine($"\nOrbital Period of the Satellite: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60), 2)} min) ,or {(((OrbitalPeriod) / 60) / 60) / 24} days");
+                Console.WriteLine($"Mean Motion of the Satellite: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+                while (true)
+                {
+                    Console.Write("\nCalculate future position of the satellite? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                    if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (Future_Choice == 'n') { break; }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+                }
+            }
+            else if (Eccentricity > 0.0 && Eccentricity <= 1.0)
+            {
+                double VelocityPlanetPeriapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusApoapsis) / (RadiusPeriapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                double VelocityPlanetApoapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusPeriapsis) / (RadiusApoapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                double OrbitalPeriod = Math.Sqrt((4 * Math.Pow(Math.PI, 2) * Math.Pow(SemiMajorAxis, 3)) / (GConstant * MassParent));
+                double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                double ApoapsisDistance = (1 + Eccentricity) * SemiMajorAxis;
+                double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                Console.WriteLine($"\nα: {Math.Round(α, 2)} ; β: {β}");
+                Console.WriteLine($"\nSemi-Major Axis: {Math.Round(SemiMajorAxis, 2)} m  ;  Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                Console.WriteLine($"\nRadius of the Orbit at: Periapsis: {Math.Round(RadiusPeriapsis, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis, 2)} m");
+                Console.WriteLine($"Height at: Periapsis: {Math.Round(RadiusPeriapsis - RadiusParent, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis - RadiusParent, 2)} m");
+                Console.WriteLine($"Velocity of the Satellite at: Periapsis: {Math.Round(VelocityPlanetPeriapsis, 2)} m/s ; Apoapsis: {Math.Round(VelocityPlanetApoapsis, 2)} m/s");
+                Console.WriteLine($"\nEccentricity: {Math.Round(Eccentricity, 4)}");
+                Console.WriteLine($"\nOrbital Period of the Satellite: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60), 2)} min) ,or {Math.Round((((OrbitalPeriod) / 60) / 60) / 24, 3)} days");
+                Console.WriteLine($"Mean Motion of the Satellite: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+
+                while (true)
+                {
+                    Console.Write("\nCalculate future position of the satellite? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                    if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (Future_Choice == 'n') { break; }
+
+                    else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); break; }
+
+                }
+            }
+            else if (Eccentricity > 1)
+            {
+                Console.WriteLine("Not possible to calculate the orbital elements of the satellite with Eccentricity greater than 1");
+                Console.Write("Leave program? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine());
+
+                if (Leave == 'n') { }
+
+                else if (Leave == 'y') { }
+
+                else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); }
+
+            }
+        }
+
+        static void SatelliteHeight(double GConstant, double MassParent, double RadiusParent)
+        {
+            Console.WriteLine("\nSatellite:\n");
+            Console.Write("Height above Sea Level at: ");
+            Console.Write("\nPeriapsis: "); double HeightPeriapsis = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture); 
+            Console.Write("Apoapsis: "); double HeightApoapsis = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+            double RadiusPeriapsis = RadiusParent + HeightPeriapsis;
+            double RadiusApoapsis = RadiusParent + HeightApoapsis;
+
+            double SemiMajorAxis = (RadiusPeriapsis + RadiusApoapsis) / 2;
+
+            double Eccentricity_Apoapsis = (RadiusApoapsis - SemiMajorAxis) / SemiMajorAxis;
+            double Eccentricity_Periapsis = (-RadiusPeriapsis + SemiMajorAxis) / SemiMajorAxis;
+
+            double Eccentricity = 0.0;
+
+            Eccentricity = Eccentricity_Apoapsis;
+
+            if (Eccentricity == 0.0)
+            {
+                double Velocity1Planet = Math.Sqrt((GConstant * MassParent) / SemiMajorAxis);
+                double OrbitalPeriod = Math.Sqrt((4 * Math.Pow(Math.PI, 2) * Math.Pow(SemiMajorAxis, 3)) / (GConstant * MassParent));
+                double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                double ApoapsisDistance = 1 / ((1 + Eccentricity) * SemiMajorAxis);
+                double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                Console.WriteLine($"\nRadius of the Orbit: {SemiMajorAxis} m");
+                Console.WriteLine($"Height: {SemiMajorAxis - RadiusParent}");
+                Console.WriteLine($"Semi-Major Axis: {Math.Round(SemiMajorAxis, 2)} ;Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                Console.WriteLine($"\nVelocity of the Satellite: {Math.Round(Velocity1Planet, 2)} m/s");
+                Console.WriteLine($"\nEccentricity: {Math.Round(Eccentricity, 4)}");
+                Console.WriteLine($"\nOrbital Period of the Satellite: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60), 2)} min) ,or {(((OrbitalPeriod) / 60) / 60) / 24} days");
+                Console.WriteLine($"Mean Motion of the Satellite: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+                while (true)
+                {
+                    Console.Write("\nCalculate future position of the satellite? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                    if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (Future_Choice == 'n') { break; }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+                }
+            }
+            else if (Eccentricity > 0.0 && Eccentricity <= 1.0)
+            {
+                double VelocityPlanetPeriapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusApoapsis) / (RadiusPeriapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                double VelocityPlanetApoapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusPeriapsis) / (RadiusApoapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                double OrbitalPeriod = Math.Sqrt((4 * Math.Pow(Math.PI, 2) * Math.Pow(SemiMajorAxis, 3)) / (GConstant * MassParent));
+                double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                double ApoapsisDistance = (1 + Eccentricity) * SemiMajorAxis;
+                double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                Console.WriteLine($"\nα: {Math.Round(α, 2)} ; β: {β}");
+                Console.WriteLine($"\nSemi-Major Axis: {Math.Round(SemiMajorAxis, 2)} m  ;  Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                Console.WriteLine($"\nRadius of the Orbit at: Periapsis: {Math.Round(RadiusPeriapsis, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis, 2)} m");
+                Console.WriteLine($"Height at: Periapsis: {Math.Round(RadiusPeriapsis - RadiusParent, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis - RadiusParent, 2)} m");
+                Console.WriteLine($"Velocity of the Satellite at: Periapsis: {Math.Round(VelocityPlanetPeriapsis, 2)} m/s ; Apoapsis: {Math.Round(VelocityPlanetApoapsis, 2)} m/s");
+                Console.WriteLine($"\nEccentricity: {Math.Round(Eccentricity, 4)}");
+                Console.WriteLine($"\nOrbital Period of the Satellite: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60), 2)} min) ,or {Math.Round((((OrbitalPeriod) / 60) / 60) / 24, 3)} days");
+                Console.WriteLine($"Mean Motion of the Satellite: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+
+                while (true)
+                {
+                    Console.Write("\nCalculate future position of the satellite? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                    if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (Future_Choice == 'n') { break; }
+
+                    else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); break; }
+
+                }
+            }
+            else if (Eccentricity > 1)
+            {
+                Console.WriteLine("Not possible to calculate the orbital elements of the satellite with Eccentricity greater than 1");
+                Console.Write("Leave program? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine());
+
+                if (Leave == 'n') { }
+
+                else if (Leave == 'y') { }
+
+                else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); }
+
+            }
+        }
+
+        static void SatelliteSemiMajorAxis(double GConstant, double MassParent, double RadiusParent)
+        {
+            Console.WriteLine("\n\nSatellite:\n");
+            Console.Write("Semi-Major Axis: "); double SemiMajorAxis = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);  // Adding some more calculations
+            Console.Write("Eccentricity: "); double Eccentricity = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+            if (Eccentricity == 0.0)
+            {
+                double Velocity1Planet = Math.Sqrt((GConstant * MassParent) / SemiMajorAxis);
+                double OrbitalPeriod = Math.Sqrt((4 * Math.Pow(Math.PI, 2) * Math.Pow(SemiMajorAxis, 3)) / (GConstant * MassParent));
+                double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                double ApoapsisDistance = 1 / ((1 + Eccentricity) * SemiMajorAxis);
+                double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                Console.WriteLine($"\nRadius of the Orbit: {SemiMajorAxis} m");
+                Console.WriteLine($"Height: {SemiMajorAxis - RadiusParent}");
+                Console.WriteLine($"Semi-Major Axis: {Math.Round(SemiMajorAxis, 2)} ;Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                Console.WriteLine($"\nVelocity of the Satellite: {Math.Round(Velocity1Planet, 2)} m/s");
+                Console.WriteLine($"\nEccentricity: {Eccentricity}");
+                Console.WriteLine($"\nOrbital Period of the Satellite: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60), 2)} min) ,or {(((OrbitalPeriod) / 60) / 60) / 24} days");
+                Console.WriteLine($"Mean Motion of the Satellite: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+                while (true)
+                {
+                    Console.Write("\nCalculate future position of the satellite? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                    if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (Future_Choice == 'n') { break; }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+                }
+            }
+            else if (Eccentricity > 0.0 && Eccentricity <= 1.0)
+            {
+                double RadiusPeriapsis = Math.Abs(SemiMajorAxis * (Eccentricity - 1));
+                double RadiusApoapsis = Math.Abs(SemiMajorAxis * (Eccentricity + 1));
+
+                double VelocityPlanetPeriapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusApoapsis) / (RadiusPeriapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                double VelocityPlanetApoapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusPeriapsis) / (RadiusApoapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                double OrbitalPeriod = Math.Sqrt((4 * Math.Pow(Math.PI, 2) * Math.Pow(SemiMajorAxis, 3)) / (GConstant * MassParent));
+                double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                double ApoapsisDistance = 1 / ((1 + Eccentricity) * SemiMajorAxis);
+                double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                Console.WriteLine($"\nα: {Math.Round(α, 2)} ; β: {β}");
+                Console.WriteLine($"\nSemi-Major Axis: {Math.Round(SemiMajorAxis, 2)} m  ;  Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                Console.WriteLine($"\nRadius of the Orbit at: Periapsis: {Math.Round(RadiusPeriapsis, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis, 2)} m");
+                Console.WriteLine($"Height at: Periapsis: {Math.Round(RadiusPeriapsis - RadiusParent, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis - RadiusParent, 2)} m");
+                Console.WriteLine($"Velocity of the Satellite at: Periapsis: {Math.Round(VelocityPlanetPeriapsis, 2)} m/s ; Apoapsis: {Math.Round(VelocityPlanetApoapsis, 2)} m/s");
+                Console.WriteLine($"\nEccentricity: {Eccentricity}");
+                Console.WriteLine($"\nOrbital Period of the Satellite: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60), 2)} min) ,or {Math.Round((((OrbitalPeriod) / 60) / 60) / 24, 3)} days");
+                Console.WriteLine($"Mean Motion of the Satellite: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+
+                while (true)
+                {
+                    Console.Write("\nCalculate future position of the satellite? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                    if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (Future_Choice == 'n') { break; }
+
+                    else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); break; }
+
+                }
+            }
+            else if (Eccentricity > 1)
+            {
+                Console.WriteLine("Not possible to calculate the orbital elements of the satellite with Eccentricity greater than 1");
+                Console.Write("Leave program? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine());
+
+                if (Leave == 'n') { }
+
+                else if (Leave == 'y') { }
+
+                else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); }
+
+            }
+        }
+
+        static void SatelliteOrbitalPeriod(double GConstant, double MassParent, double RadiusParent)
+        {
+            Console.WriteLine("\nSatellite:\n");
+            Console.Write("Calculate Orbital Period in Years, Days, Hours, Minutes, Seconds? [y/d/h/m/s]: "); char T_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+            Console.Write("Orbital Period: "); double OrbitalPeriod = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+            if (T_Choice == 'y') { OrbitalPeriod = OrbitalPeriod * 31536000; }
+            else if (T_Choice == 'd') { OrbitalPeriod = OrbitalPeriod * 86400; }
+            else if (T_Choice == 'h') { OrbitalPeriod = OrbitalPeriod * 3600; }
+            else if (T_Choice == 'm') { OrbitalPeriod = OrbitalPeriod * 60; }
+            else if (T_Choice == 's') { OrbitalPeriod = OrbitalPeriod; }
+
+            Console.Write("Eccentricity: "); double Eccentricity = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+            double SemiMajorAxis = Math.Pow((Math.Pow(OrbitalPeriod, 2) * GConstant * MassParent) / (4 * Math.Pow(Math.PI, 2)), 1.0 / 3.0);
+
+            double RadiusPeriapsis = (1 - Eccentricity) * SemiMajorAxis;
+            double RadiusApoapsis = (1 + Eccentricity) * SemiMajorAxis;
+
+            if (Eccentricity == 0.0)
+            {
+                double Velocity1Planet = Math.Sqrt((GConstant * MassParent) / SemiMajorAxis);
+                double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                double ApoapsisDistance = 1 / ((1 + Eccentricity) * SemiMajorAxis);
+                double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                Console.WriteLine($"\nRadius of the Orbit: {SemiMajorAxis} m");
+                Console.WriteLine($"Height: {SemiMajorAxis - RadiusParent}");
+                Console.WriteLine($"Semi-Major Axis: {Math.Round(SemiMajorAxis, 2)} ;Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                Console.WriteLine($"\nVelocity of the Satellite: {Math.Round(Velocity1Planet, 2)} m/s");
+                Console.WriteLine($"\nEccentricity: {Math.Round(Eccentricity, 4)}");
+                Console.WriteLine($"\nOrbital Period of the Satellite: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60), 2)} min) ,or {(((OrbitalPeriod) / 60) / 60) / 24} days");
+                Console.WriteLine($"Mean Motion of the Satellite: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+                while (true)
+                {
+                    Console.Write("\nCalculate future position of the satellite? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                    if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (Future_Choice == 'n') { break; }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+                }
+            }
+            else if (Eccentricity > 0.0 && Eccentricity <= 1.0)
+            {
+                double VelocityPlanetPeriapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusApoapsis) / (RadiusPeriapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                double VelocityPlanetApoapsis = Math.Sqrt((2 * GConstant * MassParent * RadiusPeriapsis) / (RadiusApoapsis * (RadiusApoapsis + RadiusPeriapsis)));
+                double MeanMotionPlanet = Math.Sqrt((GConstant * MassParent) / Math.Pow(SemiMajorAxis, 3));
+
+                double SemiMinorAxis = SemiMajorAxis * Math.Sqrt(1 - Math.Pow(Eccentricity, 2));
+                double SemiLactusRectum = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2));
+
+                double PerihelionDistance = (1 - Eccentricity) * SemiMajorAxis;
+                double ApoapsisDistance = (1 + Eccentricity) * SemiMajorAxis;
+                double α = ((1 + Eccentricity) * (PerihelionDistance - ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2))) / 2;
+                double β = 2 * Eccentricity / ((1 + Eccentricity) * (PerihelionDistance + ApoapsisDistance) + Math.Sqrt(Math.Pow((1 + Eccentricity), 2) * Math.Pow((PerihelionDistance + ApoapsisDistance), 2) + Math.Pow((4 * Eccentricity), 2)));
+
+                Console.WriteLine($"\nα: {Math.Round(α, 2)} ; β: {β}");
+                Console.WriteLine($"\nSemi-Major Axis: {Math.Round(SemiMajorAxis, 2)} m  ;  Semi-Minor Axis: {Math.Round(SemiMinorAxis, 2)} m");
+                Console.WriteLine($"Semi-Lactus Rectum: {Math.Round(SemiLactusRectum, 2)} m");
+                Console.WriteLine($"\nRadius of the Orbit at: Periapsis: {Math.Round(RadiusPeriapsis, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis, 2)} m");
+                Console.WriteLine($"Height at: Periapsis: {Math.Round(RadiusPeriapsis - RadiusParent, 2)} m ; Apoapsis: {Math.Round(RadiusApoapsis - RadiusParent, 2)} m");
+                Console.WriteLine($"Velocity of the Satellite at: Periapsis: {Math.Round(VelocityPlanetPeriapsis, 2)} m/s ; Apoapsis: {Math.Round(VelocityPlanetApoapsis, 2)} m/s");
+                Console.WriteLine($"\nEccentricity: {Math.Round(Eccentricity, 4)}");
+                Console.WriteLine($"\nOrbital Period of the Satellite: {Math.Round(OrbitalPeriod, 3)} s ({Math.Round((OrbitalPeriod / 60), 2)} min) ,or {Math.Round((((OrbitalPeriod) / 60) / 60) / 24, 3)} days");
+                Console.WriteLine($"Mean Motion of the Satellite: {Math.Round(MeanMotionPlanet, 10)} rad/s");
+
+
+                while (true)
+                {
+                    Console.Write("\nCalculate future position of the satellite? [y/n]: "); char Future_Choice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                    if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (Future_Choice == 'n') { break; }
+
+                    else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); break; }
+
+                }
+            }
+            else if (Eccentricity > 1)
+            {
+                Console.WriteLine("Not possible to calculate the orbital elements of the satellite with Eccentricity greater than 1");
+                Console.Write("Leave program? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine());
+
+                if (Leave == 'n') { }
+
+                else if (Leave == 'y') { }
+
+                else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); }
+
+            }
+        }
+    }
+}
