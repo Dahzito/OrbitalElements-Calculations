@@ -23,8 +23,15 @@ namespace SFS_Orbital_Elements
 
             while (true)
             {
+                double RadiusParent;
                 Console.WriteLine("\n\nParent of the Body:\n");
-                Console.Write("Radius (in m): "); double RadiusParent = double.Parse(Console.ReadLine());
+                Console.Write("Use Radius in m or km? [m/k]: "); char RadiiChoice = Convert.ToChar(Console.ReadLine().ToUpper());
+                Console.Write("Radius: "); RadiusParent = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+                if (RadiiChoice == 'M') { RadiusParent = RadiusParent; }
+                else if (RadiiChoice == 'K') { RadiusParent = RadiusParent * 1000; }
+                else { Console.WriteLine("...Invalid input..."); break; }
+
                 double GravityParent = 0.0;
                 Console.Write("Gravity: "); GravityParent = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
                 CreditsCheck(GravityParent);
@@ -75,10 +82,10 @@ namespace SFS_Orbital_Elements
                     Console.Write($"Calculate it by using Height, Radius, Semi-Major Axis, or Orbital Period? [H/R/S/O]: "); char SatChoice = Convert.ToChar(Console.ReadLine().ToUpper());
                     if (SatChoice == 'S')
                     {
-                        while (true) 
-                        { 
-                            SatelliteSemiMajorAxis(GConstant, MassParent, RadiusParent); 
-                            Console.WriteLine("Leave of this \"window\"? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
+                        while (true)
+                        {
+                            SatelliteSemiMajorAxis(GConstant, MassParent, RadiusParent);
+                            Console.Write("Leave of this \"window\"? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
                             if (Leave == 'y') { break; }
                             else if (Leave == 'n') { continue; }
                             else { Console.WriteLine("...Invalid Input, leaving by default..."); Thread.Sleep(2000); }
@@ -86,8 +93,8 @@ namespace SFS_Orbital_Elements
                     }
                     else if (SatChoice == 'H')
                     {
-                        while (true) 
-                        { 
+                        while (true)
+                        {
                             SatelliteHeight(GConstant, MassParent, RadiusParent);
                             Console.WriteLine("Leave of this \"window\"? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
                             if (Leave == 'y') { break; }
@@ -97,8 +104,8 @@ namespace SFS_Orbital_Elements
                     }
                     else if (SatChoice == 'R')
                     {
-                        while (true) 
-                        { 
+                        while (true)
+                        {
                             SatelliteRadius(GConstant, MassParent, RadiusParent);
                             Console.WriteLine("Leave of this \"window\"? [y/n]: "); char Leave = Convert.ToChar(Console.ReadLine().ToLower());
                             if (Leave == 'y') { break; }
@@ -273,19 +280,19 @@ namespace SFS_Orbital_Elements
         {
             Console.Write("Calculate it in Years, Days, Hours, Minutes or Seconds? [y/d/h/m/s]: "); char Time_Choice = Convert.ToChar(Console.ReadLine().ToLower());
             Console.Write("\nTime elapsed since Periapsis: "); double Δt = Convert.ToDouble(Console.ReadLine(), CultureInfo.InvariantCulture);
-            
+
             if (Time_Choice == 'y') { Δt = (((Δt * 24) * 60) * 60) * 365; }
-            if (Time_Choice == 'd') { Δt = ((Δt * 24) * 60) * 60;  }
+            if (Time_Choice == 'd') { Δt = ((Δt * 24) * 60) * 60; }
             else if (Time_Choice == 'h') { Δt = (Δt * 60) * 60; }
             else if (Time_Choice == 'm') { Δt = (Δt * 60); }
-            else if (Time_Choice == 's') { Δt = Δt;  }
-            
-            else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); }     
+            else if (Time_Choice == 's') { Δt = Δt; }
+
+            else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); }
 
             Anomalies(MeanMotionPlanet, Δt, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent);
 
         }
-        static void Anomalies(double MeanMotionPlanet, double Δt,  double Eccentricity, double SemiMajorAxis, double GConstant, double MassParent, double RadiusParent)
+        static void Anomalies(double MeanMotionPlanet, double Δt, double Eccentricity, double SemiMajorAxis, double GConstant, double MassParent, double RadiusParent)
         {
             double FuturePosition_Rad = MeanMotionPlanet * (Δt - 0);
             double FuturePosition_Degree = FuturePosition_Rad * (180 / Math.PI);
@@ -298,9 +305,9 @@ namespace SFS_Orbital_Elements
             }
 
             double theta = 2 * Math.Atan(Math.Sqrt((1 + Eccentricity) / (1 - Eccentricity)) * Math.Tan(eccentricAnomaly / 2));
-            
+
             double RadiusFuture = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2)) / (1 + Eccentricity * Math.Cos(theta));
-            double VelocityFuture = Math.Sqrt(GConstant*MassParent*((2/RadiusFuture)-(1/SemiMajorAxis)));
+            double VelocityFuture = Math.Sqrt(GConstant * MassParent * ((2 / RadiusFuture) - (1 / SemiMajorAxis)));
 
             double λ = ((RadiusFuture * VelocityFuture) / (GConstant * MassParent)) - 1;
             double FlightPathAngle = Math.Atan(1 / Math.Sqrt(Math.Pow(Eccentricity, 2) / Math.Pow(λ, 2)));
@@ -309,7 +316,16 @@ namespace SFS_Orbital_Elements
             Console.WriteLine($"Velocity: {Math.Round(VelocityFuture, 2)} m/s");
             Console.WriteLine($"\nFlight Path Angle: {Math.Round(FlightPathAngle, 4)}  rad  ,or  {Math.Round(FlightPathAngle * (180 / Math.PI), 4)}º");
             Console.WriteLine($"Eccentric Anomaly: {Math.Round(eccentricAnomaly, 4)} rad  ,or {Math.Round(eccentricAnomaly * (180 / Math.PI), 4)}º");
-            Console.WriteLine($"True Anomaly: {Math.Round(theta,4)} rad  ,or {Math.Round(theta * (180 / Math.PI),4)}º");
+            Console.WriteLine($"True Anomaly: {Math.Round(theta, 4)} rad  ,or {Math.Round(theta * (180 / Math.PI), 4)}º");
+
+            while (true)
+            {
+                Console.Write("\nCalculate Hohmann Trasnfer Orbit? [y/n]: "); char HoChoice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                if (HoChoice == 'y') { HohmannTransfer(Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent, theta); }
+                else if (HoChoice == 'n') { break; }
+                else { Console.WriteLine("...Ibvalid Input..."); }
+            }
         }
 
         static void SatelliteRadius(double GConstant, double MassParent, double RadiusParent)
@@ -418,7 +434,7 @@ namespace SFS_Orbital_Elements
         {
             Console.WriteLine("\nSatellite:\n");
             Console.Write("Height above Sea Level at: ");
-            Console.Write("\nPeriapsis: "); double HeightPeriapsis = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture); 
+            Console.Write("\nPeriapsis: "); double HeightPeriapsis = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
             Console.Write("Apoapsis: "); double HeightApoapsis = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
 
             double RadiusPeriapsis = RadiusParent + HeightPeriapsis;
@@ -713,8 +729,50 @@ namespace SFS_Orbital_Elements
                 else if (Leave == 'y') { }
 
                 else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); }
-
             }
+        }
+        static void HohmannTransfer(double Eccentricity, double SemiMajorAxis, double GConstant, double MassParent, double RadiusParent, double theta)
+        {
+            double PeriapsisPoint, ApoapsisPoint;
+
+            if (Eccentricity == 0) { PeriapsisPoint = SemiMajorAxis; ApoapsisPoint = SemiMajorAxis; }
+
+            else
+            {
+                PeriapsisPoint = Math.Abs(SemiMajorAxis * (Eccentricity - 1));
+                ApoapsisPoint = Math.Abs(SemiMajorAxis * (Eccentricity + 1));
+            }
+
+            double RadiusA = 0;
+            Console.WriteLine("\nHohmann Transfer Orbit Calculation: \n");
+            Console.Write("Calculate Hohmann Transfer by using current Periapsis, Apoapsis or Mean Anomaly? [P/A/M]"); char HohmannChoice = Convert.ToChar(Console.ReadLine().ToUpper());
+            if (HohmannChoice == 'P') { RadiusA = PeriapsisPoint; }
+            else if (HohmannChoice == 'A') { RadiusA = ApoapsisPoint; }
+            else if (HohmannChoice == 'M') { RadiusA = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2)) / (1 + Eccentricity * Math.Cos(theta)); }
+            Console.Write("Final Radius of the orbit: "); double FinalRadius = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+            double SemiMajorAxis_Transfer = (RadiusA + FinalRadius) / 2;
+
+            double GM = GConstant * MassParent;
+
+            double VelocityA = Math.Sqrt(GM / RadiusA);
+            double VelocityB = Math.Sqrt(GM / FinalRadius);
+
+            double VelocityA_Transfer = Math.Sqrt(GM * ((2 / RadiusA) - (1 / SemiMajorAxis_Transfer)));
+            double VelocityB_Transfer = Math.Sqrt(GM * ((2 / FinalRadius) - (1 / SemiMajorAxis_Transfer)));
+
+            double DeltaVChangeA = VelocityA_Transfer - VelocityA;
+            double DeltaVChangeB = VelocityB - VelocityB_Transfer;
+            double TotalDeltaVChange = DeltaVChangeA + DeltaVChangeB;
+
+            Console.WriteLine($"Semi-Major Axis of the transfer ellipse: {SemiMajorAxis_Transfer}");
+            Console.WriteLine($"\nVelocity at Departure point before burn: {VelocityA} m/s");
+            Console.WriteLine($"Velocity at Departure point after burn: {VelocityA_Transfer} m/s");
+            Console.WriteLine($"\nVelocity at Arrival point before burn: {VelocityB} m/s");
+            Console.WriteLine($"Velocity at Arrival point after burn: {VelocityB_Transfer} m/s");
+            Console.WriteLine($"\nDeltaV necessary at:  Departure Point: {DeltaVChangeA} m/s  ,Arrival Point {DeltaVChangeB} m/s");
+            Console.WriteLine($"Total DeltaV cost: {TotalDeltaVChange} m/s");
+
         }
     }
 }
