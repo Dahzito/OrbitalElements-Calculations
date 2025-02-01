@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Policy;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DataTypes
+{
+    class Vector2
+    {
+        public float x;
+        public float y;
+        public Vector2(float x, float y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    class Vector3
+    {
+        public float x;
+        public float y;
+        public float z;
+        public Vector3(float x, float y, float z)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+    }
+
+    class OrbitalParameters_2d
+    {
+        public float semiMajorAxis;
+        public float eccentricity;
+        public float meanmotion;
+        public OrbitalParameters_2d(float semiMajorAxis, float eccentricity, float inclination, float longitudeOfAscendingNode, float argumentOfPeriapsis, float meanmotion)
+        {
+            this.semiMajorAxis = semiMajorAxis;
+            this.eccentricity = eccentricity;
+            this.meanmotion = meanmotion;
+        }
+    }
+
+    class SatelliteData
+    {
+        public float PeriapsisRadius;
+        public float ApoapsisRadius;
+        public SatelliteData(float PeriapsisRadius, float ApoapsisRadius)
+        {
+            this.PeriapsisRadius = PeriapsisRadius;
+            this.ApoapsisRadius = ApoapsisRadius;
+        }
+    }
+
+    class PlanetData
+    {
+        public float Mass;
+        public float Radius;
+        public PlanetData(float Mass, float Radius)
+        {
+            this.Mass = Mass;
+            this.Radius = Radius;
+        }
+    }
+}
