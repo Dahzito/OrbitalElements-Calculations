@@ -14,7 +14,7 @@ namespace SFS_Orbital_Elements
     {
         public static void Main()
         {
-            string Version = "1.2.";
+            string Version = "1.2.5.";
 
 
             Console.WriteLine("|| SFS Orbital Elements - Calculations ||");
@@ -28,19 +28,44 @@ namespace SFS_Orbital_Elements
                 Console.Write("Use Radius in m or km? [m/k]: "); char RadiiChoice = Convert.ToChar(Console.ReadLine().ToUpper());
                 Console.Write("Radius: "); RadiusParent = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
 
-                if (RadiiChoice == 'M') { RadiusParent = RadiusParent; }
+                Console.Write("\nUse Mass, GM or Gravity values? [M/U/G]: "); char PlanetChoice = Convert.ToChar(Console.ReadLine().ToUpper()); 
+
+                if (RadiiChoice == 'M') {  }
                 else if (RadiiChoice == 'K') { RadiusParent = RadiusParent * 1000; }
                 else { Console.WriteLine("...Invalid input..."); break; }
 
                 double GravityParent = 0.0;
-                Console.Write("Gravity: "); GravityParent = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-                CreditsCheck(GravityParent);
-
+                double MassParent = 0.0;
                 double GConstant = 6.67430 * 10e-11;
 
-                double MassParent = (GravityParent * Math.Pow(RadiusParent, 2.0)) / GConstant;
+                if (PlanetChoice == 'G')
+                {
+                    Console.Write("Gravity: "); GravityParent = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                    CreditsCheck(GravityParent);
 
-                Console.WriteLine($"Mass of the Parent: {MassParent * 10} kg");
+                    MassParent = (GravityParent * Math.Pow(RadiusParent, 2.0)) / GConstant;
+                }
+
+                else if (PlanetChoice == 'U')
+                {
+                    Console.Write("GM value: "); double GM = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                    MassParent = GM / GConstant;
+                    GravityParent = GM / Math.Pow(RadiusParent, 2.0);
+                    CreditsCheck(GravityParent);
+
+                    MassParent = (GravityParent * Math.Pow(RadiusParent, 2.0)) / GConstant;
+                }
+
+                else if (PlanetChoice == 'M')
+                {
+                    Console.Write("M value: ");  MassParent = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                    double GM = GConstant * MassParent;
+                    GravityParent = GM / Math.Pow(RadiusParent, 2.0);
+                    CreditsCheck(GravityParent);
+                }
+
+                Console.WriteLine($"\nMass of the Parent: {MassParent * 10} kg");
+                Console.WriteLine($"Gravity of the Parent: {GravityParent} m/s²");
 
                 while (true)
                 {
@@ -285,7 +310,7 @@ namespace SFS_Orbital_Elements
             if (Time_Choice == 'd') { Δt = ((Δt * 24) * 60) * 60; }
             else if (Time_Choice == 'h') { Δt = (Δt * 60) * 60; }
             else if (Time_Choice == 'm') { Δt = (Δt * 60); }
-            else if (Time_Choice == 's') { Δt = Δt; }
+            else if (Time_Choice == 's') {  }
 
             else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); }
 
@@ -373,7 +398,14 @@ namespace SFS_Orbital_Elements
 
                     if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
 
-                    else if (Future_Choice == 'n') { break; }
+                    else if (Future_Choice == 'n') {  }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+
+                    Console.Write("Calculate current Anomalies of the satellite? [y/n]: "); char CurrentAnomalyChoice = Convert.ToChar(Console.ReadLine().ToLower());
+                    if (CurrentAnomalyChoice == 'y') { CurrentAnomalies(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (CurrentAnomalyChoice == 'n') { break; }
 
                     else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
                 }
@@ -410,10 +442,16 @@ namespace SFS_Orbital_Elements
 
                     if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
 
-                    else if (Future_Choice == 'n') { break; }
+                    else if (Future_Choice == 'n') {  }
 
                     else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); break; }
 
+                    Console.Write("Calculate current Anomalies of the satellite? [y/n]: "); char CurrentAnomalyChoice = Convert.ToChar(Console.ReadLine().ToLower());
+                    if (CurrentAnomalyChoice == 'y') { CurrentAnomalies(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (CurrentAnomalyChoice == 'n') { break; }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
                 }
             }
             else if (Eccentricity > 1)
@@ -478,7 +516,14 @@ namespace SFS_Orbital_Elements
 
                     if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
 
-                    else if (Future_Choice == 'n') { break; }
+                    else if (Future_Choice == 'n') { }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+
+                    Console.Write("Calculate current Anomalies of the satellite? [y/n]: "); char CurrentAnomalyChoice = Convert.ToChar(Console.ReadLine().ToLower());
+                    if (CurrentAnomalyChoice == 'y') { CurrentAnomalies(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (CurrentAnomalyChoice == 'n') { break; }
 
                     else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
                 }
@@ -515,10 +560,16 @@ namespace SFS_Orbital_Elements
 
                     if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
 
-                    else if (Future_Choice == 'n') { break; }
+                    else if (Future_Choice == 'n') {  }
 
                     else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); break; }
+                    
+                    Console.Write("Calculate current Anomalies of the satellite? [y/n]: "); char CurrentAnomalyChoice = Convert.ToChar(Console.ReadLine().ToLower());
+                    if (CurrentAnomalyChoice == 'y') { CurrentAnomalies(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
 
+                    else if (CurrentAnomalyChoice == 'n') { break; }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
                 }
             }
             else if (Eccentricity > 1)
@@ -570,7 +621,14 @@ namespace SFS_Orbital_Elements
 
                     if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
 
-                    else if (Future_Choice == 'n') { break; }
+                    else if (Future_Choice == 'n') {  }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+
+                    Console.Write("Calculate current Anomalies of the satellite? [y/n]: "); char CurrentAnomalyChoice = Convert.ToChar(Console.ReadLine().ToLower());
+                    if (CurrentAnomalyChoice == 'y') { CurrentAnomalies(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (CurrentAnomalyChoice == 'n') { break; }
 
                     else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
                 }
@@ -610,10 +668,16 @@ namespace SFS_Orbital_Elements
 
                     if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
 
-                    else if (Future_Choice == 'n') { break; }
+                    else if (Future_Choice == 'n') { }
 
                     else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); break; }
 
+                    Console.Write("Calculate current Anomalies of the satellite? [y/n]: "); char CurrentAnomalyChoice = Convert.ToChar(Console.ReadLine().ToLower());
+                    if (CurrentAnomalyChoice == 'y') { CurrentAnomalies(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (CurrentAnomalyChoice == 'n') { break; }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
                 }
             }
             else if (Eccentricity > 1)
@@ -640,7 +704,7 @@ namespace SFS_Orbital_Elements
             else if (T_Choice == 'd') { OrbitalPeriod = OrbitalPeriod * 86400; }
             else if (T_Choice == 'h') { OrbitalPeriod = OrbitalPeriod * 3600; }
             else if (T_Choice == 'm') { OrbitalPeriod = OrbitalPeriod * 60; }
-            else if (T_Choice == 's') { OrbitalPeriod = OrbitalPeriod; }
+            else if (T_Choice == 's') {  }
 
             Console.Write("Eccentricity: "); double Eccentricity = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
 
@@ -680,6 +744,14 @@ namespace SFS_Orbital_Elements
                     else if (Future_Choice == 'n') { break; }
 
                     else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+
+                    Console.Write("Calculate current Anomalies of the satellite? [y/n]: "); char CurrentAnomalyChoice = Convert.ToChar(Console.ReadLine().ToLower());
+                    if (CurrentAnomalyChoice == 'y') { CurrentAnomalies(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (CurrentAnomalyChoice == 'n') {  }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
+
                 }
             }
             else if (Eccentricity > 0.0 && Eccentricity <= 1.0)
@@ -713,10 +785,16 @@ namespace SFS_Orbital_Elements
 
                     if (Future_Choice == 'y') { BodyPosition(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
 
-                    else if (Future_Choice == 'n') { break; }
+                    else if (Future_Choice == 'n') { }
 
                     else { Console.WriteLine("...Inavlid Input, closing by default..."); Thread.Sleep(2000); break; }
 
+                    Console.Write("Calculate current Anomalies of the satellite? [y/n]: "); char CurrentAnomalyChoice = Convert.ToChar(Console.ReadLine().ToLower());
+                    if (CurrentAnomalyChoice == 'y') { CurrentAnomalies(MeanMotionPlanet, Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent); }
+
+                    else if (CurrentAnomalyChoice == 'n') { break; }
+
+                    else { Console.WriteLine("...Invalid Input..."); Thread.Sleep(2000); break; }
                 }
             }
             else if (Eccentricity > 1)
@@ -745,7 +823,7 @@ namespace SFS_Orbital_Elements
 
             double RadiusA = 0;
             Console.WriteLine("\nHohmann Transfer Orbit Calculation: \n");
-            Console.Write("Calculate Hohmann Transfer by using current Periapsis, Apoapsis or Mean Anomaly? [P/A/M]"); char HohmannChoice = Convert.ToChar(Console.ReadLine().ToUpper());
+            Console.Write("Calculate Hohmann Transfer by using current Periapsis, Apoapsis or Mean Anomaly? [P/A/M]: "); char HohmannChoice = Convert.ToChar(Console.ReadLine().ToUpper());
             if (HohmannChoice == 'P') { RadiusA = PeriapsisPoint; }
             else if (HohmannChoice == 'A') { RadiusA = ApoapsisPoint; }
             else if (HohmannChoice == 'M') { RadiusA = SemiMajorAxis * (1 - Math.Pow(Eccentricity, 2)) / (1 + Eccentricity * Math.Cos(theta)); }
@@ -765,14 +843,63 @@ namespace SFS_Orbital_Elements
             double DeltaVChangeB = VelocityB - VelocityB_Transfer;
             double TotalDeltaVChange = DeltaVChangeA + DeltaVChangeB;
 
-            Console.WriteLine($"Semi-Major Axis of the transfer ellipse: {SemiMajorAxis_Transfer}");
-            Console.WriteLine($"\nVelocity at Departure point before burn: {VelocityA} m/s");
-            Console.WriteLine($"Velocity at Departure point after burn: {VelocityA_Transfer} m/s");
-            Console.WriteLine($"\nVelocity at Arrival point before burn: {VelocityB} m/s");
-            Console.WriteLine($"Velocity at Arrival point after burn: {VelocityB_Transfer} m/s");
-            Console.WriteLine($"\nDeltaV necessary at:  Departure Point: {DeltaVChangeA} m/s  ,Arrival Point {DeltaVChangeB} m/s");
-            Console.WriteLine($"Total DeltaV cost: {TotalDeltaVChange} m/s");
+            Console.WriteLine($"Semi-Major Axis of the transfer ellipse: {Math.Round(SemiMajorAxis_Transfer, 2)}");
+            Console.WriteLine($"\nDeparture Point: ");
+            Console.WriteLine($"Velocity before burn: {Math.Round(VelocityA, 2)} m/s");
+            Console.WriteLine($"Velocity after burn: {Math.Round(VelocityA_Transfer, 2)} m/s");
+            Console.WriteLine($"DeltaV necessary: {Math.Round(DeltaVChangeA, 2)} m/s");
 
+            Console.WriteLine($"\nArrival Point: ");
+            Console.WriteLine($"Velocity at Arrival point before burn: {Math.Round(VelocityB_Transfer, 2)} m/s");
+            Console.WriteLine($"Velocity at Arrival point after burn: {Math.Round(VelocityB, 2)} m/s");
+            Console.WriteLine($"DeltaV necessary: {Math.Round(DeltaVChangeB, 2)} m/s");
+
+            Console.WriteLine($"\nTotal DeltaV cost: {Math.Round(TotalDeltaVChange, 2)} m/s");
+
+        }
+        
+        static void CurrentAnomalies(double MeanMotionPlanet, double Eccentricity, double GConstant, double MassParent, double RadiusParent, double SemiMajorAxis)
+        {
+            Console.WriteLine("\nCurrent Anomalies: \n");
+            Console.Write("Current height above sea level (in m): "); double Height = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+            Console.Write("Current Velocity of the satellite (in m/s): "); double CurrentVelocity = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+            double CurrentRadius = RadiusParent + Height;
+
+            double CurrentTrueAnomaly = Math.Acos((((SemiMajorAxis*(1 - Math.Pow(Eccentricity, 2))) / CurrentRadius) - 1) / Eccentricity);
+
+            double CurrentEccentricAnomaly = (Eccentricity + Math.Cos(CurrentTrueAnomaly)) / (1 + Eccentricity * Math.Cos(CurrentTrueAnomaly));
+
+            double MeanAnomaly_Rad = CurrentEccentricAnomaly - (Eccentricity * Math.Sin(CurrentEccentricAnomaly));
+            double MeanAnomaly_Degree = MeanAnomaly_Rad * (180 / Math.PI);
+
+            Console.WriteLine($"\nFuture Position (Mean Anomaly): {Math.Round(MeanAnomaly_Rad, 3)} rad ,or {Math.Round(MeanAnomaly_Degree, 3)}° ,or {Math.Round((MeanAnomaly_Degree / 360), 4)} Revolutions");
+
+            double eccentricAnomaly = MeanAnomaly_Rad; // Initial guess
+            for (int i = 0; i < 10; i++) // Iterate 10 times for convergence
+            {
+                eccentricAnomaly = MeanAnomaly_Rad + Eccentricity * Math.Sin(eccentricAnomaly);
+            }
+
+            double theta = 2 * Math.Atan(Math.Sqrt((1 + Eccentricity) / (1 - Eccentricity)) * Math.Tan(eccentricAnomaly / 2));
+
+            double λ = ((CurrentRadius * CurrentVelocity) / (GConstant * MassParent)) - 1;
+            double FlightPathAngle = Math.Atan(1 / Math.Sqrt(Math.Pow(Eccentricity, 2) / Math.Pow(λ, 2)));
+
+            Console.WriteLine($"\nRadius:  {Math.Round(CurrentRadius, 2)} m  ,Height: {Math.Round(Height, 2)} m");
+            Console.WriteLine($"Velocity: {Math.Round(CurrentVelocity, 2)} m/s");
+            Console.WriteLine($"\nFlight Path Angle: {Math.Round(FlightPathAngle, 4)}  rad  ,or  {Math.Round(FlightPathAngle * (180 / Math.PI), 4)}º");
+            Console.WriteLine($"Eccentric Anomaly: {Math.Round(eccentricAnomaly, 4)} rad  ,or {Math.Round(eccentricAnomaly * (180 / Math.PI), 4)}º");
+            Console.WriteLine($"True Anomaly: {Math.Round(theta, 4)} rad  ,or {Math.Round(theta * (180 / Math.PI), 4)}º");
+
+                while (true)
+                {
+                    Console.Write("\nCalculate Hohmann Trasnfer Orbit? [y/n]: "); char HoChoice = Convert.ToChar(Console.ReadLine().ToLower());
+
+                    if (HoChoice == 'y') { HohmannTransfer(Eccentricity, SemiMajorAxis, GConstant, MassParent, RadiusParent, theta); }
+                    else if (HoChoice == 'n') { break; }
+                    else { Console.WriteLine("...Ibvalid Input..."); }
+                }
         }
     }
 }
